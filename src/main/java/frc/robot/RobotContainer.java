@@ -3,7 +3,12 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
-import com.kauailabs.navx.frc.AHRS;
+//fully importing com file odes not resolve object initialization errors; find com file and confirm it exists
+
+//import edu.kauailabs.navx.frc.AHRS;
+import com.studica.frc.*;
+
+
 
 import edu.wpi.first.math.MathUtil;
 
@@ -31,7 +36,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.Date;
-
 
 
 
@@ -96,7 +100,7 @@ public class RobotContainer {
 
       m_input.setDefaultCommand(new RunCommand(() -> m_input.stop(), m_input));
 
-        m_climbers.setDefaultCommand(new RunCommand(() -> m_climbers.stop(), m_climbers));        
+        //m_climbers.setDefaultCommand(new RunCommand(() -> m_climbers.stop(), m_climbers));        
         m_gyro.setDefaultCommand(
             new RunCommand(
             () -> m_gyro.putGyro()    
@@ -218,12 +222,14 @@ public class RobotContainer {
     .whileFalse(new InstantCommand(
             () -> m_input.stop(), m_input));
 
-    new JoystickButton(m_driverController, 5)
-    .whileTrue(new RunCommand(
-            () -> m_climbers.extend(1), m_climbers));
-    new JoystickButton(m_driverController, 3)
-    .whileTrue(new RunCommand(
-            () -> m_climbers.extend(-1), m_climbers));
+    // new JoystickButton(m_driverController, 5)
+    // .whileTrue(new RunCommand(
+    //         () -> m_climbers.extend(1), m_climbers));
+    // new JoystickButton(m_driverController, 3)
+    // .whileTrue(new RunCommand(
+    //         () -> m_climbers.extend(-1), m_climbers));
+
+
     // new JoystickButton(m_driverController, 3)
     // .whileFalse(new InstantCommand(
     //         () -> m_climbers.stop(), m_climbers));

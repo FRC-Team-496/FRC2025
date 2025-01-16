@@ -1,10 +1,10 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkMax;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.SparkMaxRelativeEncoder;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkRelativeEncoder;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -13,16 +13,16 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Input extends SubsystemBase{
 
-    CANSparkMax m_motor;
+    SparkMax m_motor;
     private double speed = .2; //1
     DigitalInput m_limmitTop;
     DigitalInput m_limmitBottom;
-    SparkMaxPIDController m_pidController;
+    SparkClosedLoopController m_pidController;
 
     public Input(){
 
-        m_motor = new CANSparkMax(62, MotorType.kBrushless);
-        m_pidController = m_motor.getPIDController();
+        m_motor = new SparkMax(62, MotorType.kBrushless);
+        m_pidController = m_motor.getClosedLoopController();
 
         m_limmitTop = new DigitalInput(0);
         m_limmitBottom = new DigitalInput(1);
