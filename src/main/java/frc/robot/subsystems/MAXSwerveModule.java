@@ -23,6 +23,7 @@ import java.io.ObjectInputFilter.Config;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
 
 public class MAXSwerveModule {
@@ -53,21 +54,51 @@ public class MAXSwerveModule {
     m_turningSparkMax = new SparkMax(turningCANId, MotorType.kBrushless);
     // Factory reset, so we get the SPARKS MAX to a known state before configuring
     // them. This is useful in case a SPARK MAX is swapped out.
-    SparkMaxConfig config = new SparkMaxConfig();
+    SparkMaxConfig drivingConfig = new SparkMaxConfig();
 
-    config
-        .inverted(true)
-        .idleMode(IdleMode.kBrake);
-    config.encoder
-        .positionConversionFactor(1000)
-        .velocityConversionFactor(1000);
-    config.closedLoop
+    drivingConfig
+            .idleMode(IdleMode.kBrake)
+            .smartCurrentLimit(ModuleConstants.kDrivingMotorCurrentLimit);
+    drivingConfig.encoder
+        .positionConversionFactor(ModuleConstants.kDrivingEncoderPositionFactor)
+        .velocityConversionFactor(ModuleConstants.kDrivingEncoderVelocityFactor);
+    drivingConfig.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .pid(1.0, 0.0, 0.0);
-        
-    m_drivingSparkMax.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        .pidf(ModuleConstants.kDrivingP,
+              ModuleConstants.kDrivingI,
+              ModuleConstants.kDrivingD,
+              ModuleConstants.kDrivingFF)
+        .outputRange(ModuleConstants.kDrivingMinOutput,
+                    ModuleConstants.kDrivingMaxOutput);        
+    m_drivingSparkMax.configure(drivingConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    
+    SparkMaxConfig turningConfig = new SparkMaxConfig();
+    turningConfig
+        
+        .idleMode(IdleMode.kBrake)
+        .smartCurrentLimit(ModuleConstants.kTurningMotorCurrentLimit);
+    turningConfig.absoluteEncoder
+        .inverted(true)
+        .positionConversionFactor(ModuleConstants.kTurningEncoderPositionFactor)
+        .velocityConversionFactor(ModuleConstants.kTurningEncoderVelocityFactor);
+    turningConfig.closedLoop
+        .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+
+        .positionWrappingEnabled(true)
+        .positionWrappingMinInput(ModuleConstants.kTurningEncoderPositionPIDMinInput)
+        .positionWrappingMaxInput(ModuleConstants.kTurningEncoderPositionPIDMaxInput)
+
+        .pidf(ModuleConstants.kTurningP,
+              ModuleConstants.kTurningI,
+              ModuleConstants.kTurningD,
+              ModuleConstants.kTurningFF)
+        .outputRange(ModuleConstants.kTurningMinOutput,
+                    ModuleConstants.kTurningMaxOutput);   
+
+
+        //.pid(1.0, 0, 0);
+    m_turningSparkMax.configure(turningConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
 
 
     // Setup encoders and PID controllers for the driving and turning SPARKS MAX.
@@ -187,21 +218,33 @@ public class MAXSwerveModule {
     
     m_drivingPIDController.setReference(optimizedDesiredState.speedMetersPerSecond, SparkMax.ControlType.kVelocity);
     m_turningPIDController.setReference(optimizedDesiredState.angle.getRadians(), SparkMax.ControlType.kPosition);
-    if(drivingCANId == 11){
-      SmartDashboard.putNumber("Front Left Rotation", optimizedDesiredState.angle.getRadians()+(Math.PI/2));
+    if(drivingCANId == DriveConstants.kFrontLeftDrivingCanId){
+      SmartDashboard.putNumber("FL input Rot", desiredState.angle.getRadians());
+      SmartDashboard.putNumber("Front Left cmd rot", optimizedDesiredState.angle.getRadians());
       SmartDashboard.putNumber("Front Left Speed", optimizedDesiredState.speedMetersPerSecond);
+      SmartDashboard.putNumber("Front Left angle", m_turningEncoder.getPosition());
+
     }
-    if(drivingCANId == 15){
+    if(drivingCANId == DriveConstants.kFrontRightDrivingCanId){
+      SmartDashboard.putNumber("FR input Rot", desiredState.angle.getRadians());
       SmartDashboard.putNumber("Front Right Speed", optimizedDesiredState.speedMetersPerSecond);
       SmartDashboard.putNumber("Front Right Rotation", optimizedDesiredState.angle.getRadians());
+      SmartDashboard.putNumber("Front Right angle", m_turningEncoder.getPosition());
+
     }
-    if(drivingCANId == 13){
+    if(drivingCANId == DriveConstants.kRearLeftDrivingCanId){
+      SmartDashboard.putNumber("BL input Rot", desiredState.angle.getRadians());
       SmartDashboard.putNumber("Back Left Speed", optimizedDesiredState.speedMetersPerSecond);
-      SmartDashboard.putNumber("Back Left Rotation", optimizedDesiredState.angle.getRadians()-Math.PI);
+      SmartDashboard.putNumber("Back Left Rotation", optimizedDesiredState.angle.getRadians());
+      SmartDashboard.putNumber("Back Left angle", m_turningEncoder.getPosition());
+
     }
-    if(drivingCANId == 17){
+    if(drivingCANId == DriveConstants.kRearRightDrivingCanId){
+      SmartDashboard.putNumber("BR input Rot", desiredState.angle.getRadians());
       SmartDashboard.putNumber("Back Right Speed", optimizedDesiredState.speedMetersPerSecond);
-      SmartDashboard.putNumber("Back Right Rotation", optimizedDesiredState.angle.getRadians()-(Math.PI/2));
+      SmartDashboard.putNumber("Back Right Rotation", optimizedDesiredState.angle.getRadians());
+      SmartDashboard.putNumber("Back Right angle", m_turningEncoder.getPosition());
+
     }
     m_desiredState = desiredState;
 
