@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.studica.frc.*;
 import com.studica.frc.AHRS.NavXComType;
 
-import edu.wpi.first.wpilibj.SPI.Port;
 
 public class NavX extends SubsystemBase{
 
