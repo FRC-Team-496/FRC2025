@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.Camera;
-import frc.robot.subsystems.Climbers;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Input;
 import frc.robot.subsystems.NavX;
@@ -57,7 +57,7 @@ public class RobotContainer {
   private final SALUS m_salus = new SALUS();
   private final Output m_output = new Output();
   private final Input m_input = new Input();
-  private final Climbers m_climbers = new Climbers();
+  private final Climber m_climbers = new Climber();
   private SendableChooser<Integer> m_chooser = new SendableChooser<Integer>(); 
 
 
@@ -222,12 +222,12 @@ public class RobotContainer {
     .whileFalse(new InstantCommand(
             () -> m_input.stop(), m_input));
 
-    // new JoystickButton(m_driverController, 5)
-    // .whileTrue(new RunCommand(
-    //         () -> m_climbers.extend(1), m_climbers));
-    // new JoystickButton(m_driverController, 3)
-    // .whileTrue(new RunCommand(
-    //         () -> m_climbers.extend(-1), m_climbers));
+    new JoystickButton(m_driverController, 5)
+      .whileTrue(new RunCommand(
+             () -> m_climbers.extend(1), m_climbers));
+    new JoystickButton(m_driverController, 3)
+     .whileTrue(new RunCommand(
+             () -> m_climbers.extend(-1), m_climbers));
 
 
     // new JoystickButton(m_driverController, 3)
