@@ -8,8 +8,7 @@ package frc.robot;
 //import edu.kauailabs.navx.frc.AHRS;
 import com.studica.frc.*;
 
-
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.math.MathUtil;
 
 import edu.wpi.first.wpilibj.GenericHID;
@@ -25,13 +24,8 @@ import frc.robot.subsystems.DriveSubsystem;
 
 import frc.robot.subsystems.NavX;
 import frc.robot.subsystems.SALUS;
-
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-
-import edu.wpi.first.wpilibj2.command.RunCommand;
-
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 
@@ -134,7 +128,7 @@ public class RobotContainer {
    
 
 
-  
+   
 
 
 
@@ -157,6 +151,12 @@ public class RobotContainer {
     new JoystickButton(m_driverController, 1) 
     .whileTrue(new InstantCommand(
             () -> m_salus.set()));
+
+    //
+    new JoystickButton(m_driverController, 2)
+      .whileTrue(Camera.getDetected_ID() == 7 ? new ParallelCommandGroup(new RunCommand(() -> m_robotDrive.drive(0, 1, 0, false, 0.3), m_robotDrive), new RunCommand(() -> System.out.println("test")) )
+      : new ParallelCommandGroup(new RunCommand(() -> m_robotDrive.drive(0, 0, 0, false, 0.0), m_robotDrive), new RunCommand(() -> System.out.println(Camera.getDetected_ID())) )
+      );
 
     
  
