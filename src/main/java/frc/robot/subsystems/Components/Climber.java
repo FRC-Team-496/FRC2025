@@ -23,7 +23,7 @@ public class Climber extends SubsystemBase{
         //m_motor2 = new SparkMax(21, MotorType.kBrushless);
         //m_motor1.getEncoder().setPosition(0.0);
         //m_motor2.getEncoder().setPosition(0.0);
-        // -178
+     
         m_kraken = new TalonFX(0);
     }
 
@@ -36,6 +36,6 @@ public class Climber extends SubsystemBase{
 
     public void stop(){
          m_kraken.set(0);
-         m_kraken.set(0);
+         
     }
 }

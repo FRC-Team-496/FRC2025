@@ -19,11 +19,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.Camera;
-import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveSubsystem;
 
 import frc.robot.subsystems.NavX;
 import frc.robot.subsystems.SALUS;
+import frc.robot.subsystems.Components.AlageIntake;
+import frc.robot.subsystems.Components.Climber;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -45,7 +46,7 @@ public class RobotContainer {
   private final Camera m_camera = new Camera();
   private final NavX m_gyro = new NavX();
   private final SALUS m_salus = new SALUS();
-
+  private final AlageIntake AlageIntake = new AlageIntake();
   private final Climber m_climbers = new Climber();
   private SendableChooser<Integer> m_chooser = new SendableChooser<Integer>(); 
 
@@ -137,12 +138,14 @@ public class RobotContainer {
 
   private void configureButtonBindings() {
 
-    
+    // Driving, joystick on driver controller
     new JoystickButton(m_driverController, Button.kR1.value)
         .whileTrue(new RunCommand(
             () -> m_robotDrive.setX(),
             m_robotDrive));
 
+
+    // SALUS, button 1 driver controller (Back trigger)
     new JoystickButton(m_driverController, 1) //SALUS
     .whileTrue(new RunCommand(
             () -> m_robotDrive.drive(0, m_salus.calcX(), m_salus.calcYaw() / 2, false, 0.3), 
@@ -152,46 +155,52 @@ public class RobotContainer {
     .whileTrue(new InstantCommand(
             () -> m_salus.set()));
 
-    //
-    new JoystickButton(m_driverController, 2)
-      .whileTrue(Camera.getDetected_ID() == 7 ? new ParallelCommandGroup(new RunCommand(() -> m_robotDrive.drive(0, 1, 0, false, 0.3), m_robotDrive), new RunCommand(() -> System.out.println("test")) )
-      : new ParallelCommandGroup(new RunCommand(() -> m_robotDrive.drive(0, 0, 0, false, 0.0), m_robotDrive), new RunCommand(() -> System.out.println(Camera.getDetected_ID())) )
-      );
 
-    
- 
-
+    // Climbers, buttons 3 and 5 driver controller
     new JoystickButton(m_driverController, 5)
       .whileTrue(new RunCommand(
              () -> m_climbers.extend(1), m_climbers));
     new JoystickButton(m_driverController, 3)
      .whileTrue(new RunCommand(
              () -> m_climbers.extend(-1), m_climbers));
+    new JoystickButton(m_driverController, 3)
+    .whileFalse(new InstantCommand(
+            () -> m_climbers.stop(), m_climbers));
+    new JoystickButton(m_driverController, 5)
+    .whileFalse(new InstantCommand(
+            () -> m_climbers.stop(), m_climbers));
 
 
-    // new JoystickButton(m_driverController, 3)
-    // .whileFalse(new InstantCommand(
-    //         () -> m_climbers.stop(), m_climbers));
-    // new JoystickButton(m_driverController, 5)
-    // .whileFalse(new InstantCommand(
-    //         () -> m_climbers.stop(), m_climbers));
-
+    new JoystickButton(m_driverController, 7)
+    .whileTrue(new InstantCommand(
+            () -> AlageIntake.moveAlageIntake(1), AlageIntake));
     
+    new JoystickButton(m_driverController, 7)
+    .whileFalse(new InstantCommand(
+            () -> AlageIntake.intakeStop(), AlageIntake));
+
+        new JoystickButton(m_driverController, 9)
+            .whileTrue(new InstantCommand(
+                    () -> AlageIntake.moveAlageIntake(-1), AlageIntake));
+            
+            new JoystickButton(m_driverController, 9)
+            .whileFalse(new InstantCommand(
+                    () -> AlageIntake.intakeStop(), AlageIntake));
+
+
+    new JoystickButton(m_driverController, 8)
+    .whileTrue(new InstantCommand(
+            () -> AlageIntake.spinAlageWheels(1), AlageIntake));
+    
+    new JoystickButton(m_driverController, 8)
+    .whileFalse(new InstantCommand(
+            () -> AlageIntake.wheelsStop(), AlageIntake));
         
     
     
-    m_chooser.addOption("Drop and slide", 3);
-    SmartDashboard.putData(m_chooser);
+    // m_chooser.addOption("Drop and slide", 3);
+    // SmartDashboard.putData(m_chooser);
     
-    // new JoystickButton(m_driverController, 2).whileTrue(
-    //     new InstantCommand(
-    //         () -> m_pixy.setLamp(1, 1), 
-    //         m_pixy));
-
-    // new JoystickButton(m_driverController, 3).whileTrue(
-    //     new InstantCommand(
-    //         () -> m_pixy.setLamp(0, 0), 
-    //         m_pixy));
   }
 
   /**
