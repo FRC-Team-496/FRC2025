@@ -172,29 +172,43 @@ public class RobotContainer {
 
 
     new JoystickButton(m_driverController, 7)
-    .whileTrue(new InstantCommand(
+    .whileTrue(new RunCommand(
             () -> AlageIntake.moveAlageIntake(1), AlageIntake));
     
     new JoystickButton(m_driverController, 7)
-    .whileFalse(new InstantCommand(
+    .onFalse(new InstantCommand(
             () -> AlageIntake.intakeStop(), AlageIntake));
 
-        new JoystickButton(m_driverController, 9)
-            .whileTrue(new InstantCommand(
-                    () -> AlageIntake.moveAlageIntake(-1), AlageIntake));
+
+        // new JoystickButton(m_driverController, 9)
+        //     .whileTrue(new InstantCommand(
+        //             () -> AlageIntake.moveAlageIntake(-1), AlageIntake));
             
-            new JoystickButton(m_driverController, 9)
-            .whileFalse(new InstantCommand(
-                    () -> AlageIntake.intakeStop(), AlageIntake));
+            
+        //             new JoystickButton(m_driverController, 9)
+        //             .onFalse(new InstantCommand(
+        //                     () -> AlageIntake.wheelsStop(), AlageIntake));
+                    
+                    
+
 
 
     new JoystickButton(m_driverController, 8)
     .whileTrue(new InstantCommand(
             () -> AlageIntake.spinAlageWheels(1), AlageIntake));
+
+            new JoystickButton(m_driverController, 10)
+    .whileTrue(new InstantCommand(
+            () -> AlageIntake.spinAlageWheels(-1), AlageIntake));
     
+
     new JoystickButton(m_driverController, 8)
-    .whileFalse(new InstantCommand(
+    .onFalse(new InstantCommand(
             () -> AlageIntake.wheelsStop(), AlageIntake));
+
+//             new JoystickButton(m_driverController, 10)
+//     .onFalse(new InstantCommand(
+//             () -> AlageIntake.wheelsStop(), AlageIntake));
         
     
     
