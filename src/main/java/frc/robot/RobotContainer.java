@@ -156,6 +156,7 @@ public class RobotContainer {
             () -> m_salus.set()));
 
 
+
     // Climbers, buttons 3 and 5 driver controller
     new JoystickButton(m_driverController, 5)
       .whileTrue(new RunCommand(
@@ -171,50 +172,39 @@ public class RobotContainer {
             () -> m_climbers.stop(), m_climbers));
 
 
-    new JoystickButton(m_driverController, 7)
-    .whileTrue(new RunCommand(
-            () -> AlageIntake.moveAlageIntake(1), AlageIntake));
     
-    new JoystickButton(m_driverController, 7)
-    .onFalse(new InstantCommand(
-            () -> AlageIntake.intakeStop(), AlageIntake));
 
 
-        // new JoystickButton(m_driverController, 9)
-        //     .whileTrue(new InstantCommand(
-        //             () -> AlageIntake.moveAlageIntake(-1), AlageIntake));
             
             
-        //             new JoystickButton(m_driverController, 9)
-        //             .onFalse(new InstantCommand(
-        //                     () -> AlageIntake.wheelsStop(), AlageIntake));
-                    
-                    
+       
+        //Algae Intake commands
+                new JoystickButton(m_driverController, 7)
+                .whileTrue(new InstantCommand(
+                        () -> AlageIntake.wheelsStop(), AlageIntake));
+                
+                new JoystickButton(m_driverController, 9)
+                .whileTrue(new InstantCommand(
+                        () -> AlageIntake.spinAlageWheels(-1), AlageIntake));
+
+                new JoystickButton(m_driverController, 11)
+                .whileTrue(new InstantCommand(
+                        () -> AlageIntake.spinAlageWheels(1), AlageIntake));
+
+                new JoystickButton(m_driverController, 8)
+                .onTrue(new RunCommand(
+                        () -> AlageIntake.setActive(), AlageIntake));
+
+                new JoystickButton(m_driverController, 10)
+                .onTrue(new RunCommand(
+                        () -> AlageIntake.setIdle(), AlageIntake));
 
 
+                
+                
+                        
 
-    new JoystickButton(m_driverController, 8)
-    .whileTrue(new InstantCommand(
-            () -> AlageIntake.spinAlageWheels(1), AlageIntake));
 
-            new JoystickButton(m_driverController, 10)
-    .whileTrue(new InstantCommand(
-            () -> AlageIntake.spinAlageWheels(-1), AlageIntake));
-    
-
-    new JoystickButton(m_driverController, 8)
-    .onFalse(new InstantCommand(
-            () -> AlageIntake.wheelsStop(), AlageIntake));
-
-//             new JoystickButton(m_driverController, 10)
-//     .onFalse(new InstantCommand(
-//             () -> AlageIntake.wheelsStop(), AlageIntake));
-        
-    
-    
-    // m_chooser.addOption("Drop and slide", 3);
-    // SmartDashboard.putData(m_chooser);
-    
   }
 
   /**

@@ -17,6 +17,13 @@ public class Arm extends SubsystemBase{
     
     double speed = .3;
     
+    double L1pos;
+    double L2pos;
+    double L3pos;
+    double L4pos;
+
+    double feederPos;
+
     public Arm(){
         
         armMotor = new SparkMax(21, MotorType.kBrushless);
@@ -34,6 +41,7 @@ public class Arm extends SubsystemBase{
     public void wheelsStop(){
         armMotor.set(0);
     }
+
 
     
 
