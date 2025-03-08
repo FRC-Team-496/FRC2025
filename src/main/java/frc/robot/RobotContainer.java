@@ -23,6 +23,7 @@ import frc.robot.subsystems.DriveSubsystem;
 
 import frc.robot.subsystems.NavX;
 import frc.robot.subsystems.SALUS;
+import frc.robot.subsystems.Components.Arm;
 import frc.robot.subsystems.Components.AlageIntake;
 import frc.robot.subsystems.Components.Climber;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -49,6 +50,7 @@ public class RobotContainer {
   private final AlageIntake AlageIntake = new AlageIntake();
   private final Climber m_climbers = new Climber();
   private SendableChooser<Integer> m_chooser = new SendableChooser<Integer>(); 
+  private final Arm m_arm = new Arm();
 
 
 //   private final Pixy2 m_pixy = new Pixy2();
@@ -159,11 +161,13 @@ public class RobotContainer {
 
     // Climbers, buttons 3 and 5 driver controller
     new JoystickButton(m_driverController, 5)
-      .whileTrue(new RunCommand(
+      .whileTrue(new InstantCommand(
              () -> m_climbers.extend(1), m_climbers));
+
     new JoystickButton(m_driverController, 3)
-     .whileTrue(new RunCommand(
+     .whileTrue(new InstantCommand(
              () -> m_climbers.extend(-1), m_climbers));
+
     new JoystickButton(m_driverController, 3)
     .whileFalse(new InstantCommand(
             () -> m_climbers.stop(), m_climbers));
@@ -172,7 +176,70 @@ public class RobotContainer {
             () -> m_climbers.stop(), m_climbers));
 
 
-    
+
+        //Arm up and down
+            new JoystickButton(m_driverController, 6)
+      .whileTrue(new RunCommand(
+             () -> m_arm.moveArm(1), m_arm));
+
+    new JoystickButton(m_driverController, 4)
+     .whileTrue(new RunCommand(
+             () -> m_arm.moveArm(-1), m_arm));
+
+    new JoystickButton(m_driverController, 4)
+    .whileFalse(new InstantCommand(
+            () -> m_arm.stopArm(), m_arm));
+    new JoystickButton(m_driverController, 6)
+    .whileFalse(new InstantCommand(
+            () -> m_arm.stopArm(), m_arm));
+
+
+            // Arm set to positions
+
+//             new JoystickButton(m_driverController, 3)
+//       .whileTrue(new RunCommand(
+//              () -> m_arm.goToLevel(0), m_arm));
+
+//     new JoystickButton(m_driverController, 4)
+//      .whileTrue(new RunCommand(
+//              () -> m_arm.goToLevel(1), m_arm));
+
+//     new JoystickButton(m_driverController, 5)
+//     .whileTrue(new RunCommand(
+//             () -> m_arm.goToLevel(2), m_arm));
+
+//     new JoystickButton(m_driverController, 6)
+//     .whileTrue(new RunCommand(
+//             () ->m_arm.goToLevel(3), m_arm));
+
+
+// claw
+
+            new JoystickButton(m_driverController2, 1)
+            .whileTrue(new RunCommand(
+                   () -> m_arm.moveClaw(1), m_arm));
+      
+        //   new JoystickButton(m_driverController2, 8)
+        //    .whileTrue(new InstantCommand(
+        //            () -> m_arm.moveClaw(-1), m_arm));
+      
+          new JoystickButton(m_driverController2, 1)
+          .whileFalse(new InstantCommand(
+                  () -> m_arm.stopClaw(), m_arm));
+        //   new JoystickButton(m_driverController2, 8)
+        //   .whileFalse(new InstantCommand(
+        //           () -> m_arm.stopClaw(), m_arm));
+
+
+
+
+
+
+
+
+
+
+
 
 
             

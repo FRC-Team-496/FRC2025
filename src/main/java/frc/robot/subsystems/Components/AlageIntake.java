@@ -29,6 +29,8 @@ public class AlageIntake extends SubsystemBase{
     RelativeEncoder wheelEncoder;
 
     boolean wheelsOn = true;
+
+    int algaeSequence = 0;
     // RelativeEncoder tempEncoder;
     
     
@@ -93,7 +95,22 @@ public class AlageIntake extends SubsystemBase{
     }
 
 
+    public void AlgaeSequence(){
+        if(algaeSequence == 0){
+            
+        }
+        else if(algaeSequence == 1){
 
+        }
+        else if(algaeSequence == 2){
+
+        }
+        else if(algaeSequence == 3){
+
+        }
+
+        algaeSequence = algaeSequence + 1 % 4;
+    } 
 
 
 

@@ -13,14 +13,17 @@ public class Camera extends SubsystemBase {
     private static double statY;
     private static int detected_ID;
 
+    private static int cameraPipelineID = 0;
+    private static int neuralNetworkpipelineId;
+
     public void startCamera() {
-        NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-        NetworkTableEntry tx = table.getEntry("tx");
-        NetworkTableEntry ty = table.getEntry("ty");
-        NetworkTableEntry ta = table.getEntry("ta");
-        NetworkTableEntry botpose = table.getEntry("botpose");
-        NetworkTableEntry pipeline = table.getEntry("pipeline");
-        int aprilTagID =  (int) table.getEntry("tid").getDouble(-1);
+        NetworkTable armTable = NetworkTableInstance.getDefault().getTable("limelight-arm");
+        NetworkTableEntry tx = armTable.getEntry("tx");
+        NetworkTableEntry ty = armTable.getEntry("ty");
+        NetworkTableEntry ta = armTable.getEntry("ta");
+        NetworkTableEntry botpose = armTable.getEntry("botpose");
+        NetworkTableEntry pipeline = armTable.getEntry("pipeline");
+        int aprilTagID =  (int) armTable.getEntry("tid").getDouble(-1);
         detected_ID = aprilTagID;
         
         
@@ -44,9 +47,13 @@ public class Camera extends SubsystemBase {
         SmartDashboard.putNumber("zLimelightBotRoll", bot[3]);
         SmartDashboard.putNumber("LimelightBotPitch", bot[4]);
         SmartDashboard.putNumber("LimelightBotYaw", bot[5]);
-        pipeline.setNumber(0);
+        pipeline.setNumber(cameraPipelineID);
         
         SmartDashboard.putNumber("Tag ID", aprilTagID);
+
+
+        NetworkTable algaeTable = NetworkTableInstance.getDefault().getTable("limelight-algae");
+        SmartDashboard.putNumber("LimelightXAlgae", algaeTable.getEntry("tx").getDouble(10.0));
     }
 
 
