@@ -26,13 +26,13 @@ public class Arm extends SubsystemBase{
 
     double[] coralTreeArmPositions = {0.0, 0.0, 0.0, 40.0};
 
-    double feederArmPos;
+    double feederArmPos = 80;
 
 //
     // add to go to level method
     double[] coralTreeClawPositions = {1.0, 2.0, 3.0, 4.0}; 
 
-    double feederClawPos;
+    double feederClawPos = 3.5;
     
 
     double forwardLimit = 100;
@@ -50,12 +50,11 @@ public class Arm extends SubsystemBase{
         clawMotor = new SparkMax(53, MotorType.kBrushless);
 
         armEncoder = armMotor.getEncoder();
-        armEncoder.setPosition(0.0);
 
 
         clawEncoder = armMotor.getEncoder();
-        clawEncoder.setPosition(0.0);
 
+        resetEncoder();
 
 
         armPid = new PIDController(.4, 0, 0);
@@ -72,44 +71,31 @@ public class Arm extends SubsystemBase{
 
     }
 
-    public void moveArm(int dir){ // 1 for intake, -1 for push out
-        armMotor.set(armSpeed * dir);
-        SmartDashboard.putNumber("armPostion", armEncoder.getPosition());
-    }
-
-    public void stopArm(){
-        armMotor.set(0);
-    }
-
-
-    public void goToLevel(int level){
-        double desiredArmPosition = coralTreeArmPositions[level];
-        
-        armMotor.set(MathUtil.clamp(armPid.calculate(armEncoder.getPosition(), desiredArmPosition), -.2, .2));
-
-        double desiredClawPosition = coralTreeClawPositions[level];
-
-        // clawMotor.set(MathUtil.clamp(clawPid.calculate(clawEncoder.getPosition(), desiredClawPosition), -.2, .2));
-       
-        
-        SmartDashboard.putNumber("clawPostion", clawEncoder.getPosition());
-
-        SmartDashboard.putNumber("armPostion", armEncoder.getPosition());
-    }
-
-
-
-
-
-    public void moveClaw(int dir){ // 1 for intake, -1 for push out
-        clawMotor.set(clawSpeed * dir);
-        
-    }
-
-    public void stopClaw(){
-        clawMotor.set(0);
-    }
-
     
+    public void goToFeeder(){
+        //armMotor.set(MathUtil.clamp(armPid.calculate(armEncoder.getPosition(), feederArmPos), -.2, .2)); 
+
+        clawMotor.set(MathUtil.clamp(clawPid.calculate(clawEncoder.getPosition(), feederClawPos), -.2, .2)); 
+
+
+        SmartDashboard.putNumber("clawPostion", clawEncoder.getPosition());
+        SmartDashboard.putNumber("armPostion", armEncoder.getPosition());
+
+        System.out.println(clawEncoder.getPosition());
+    }
+
+
+
+
+
+
+    public void resetEncoder(){
+        clawEncoder.setPosition(0.0);
+        armEncoder.setPosition(0.0);
+
+        SmartDashboard.putNumber("clawPostion", clawEncoder.getPosition());
+        SmartDashboard.putNumber("armPostion", armEncoder.getPosition());
+
+    }
 
 }
