@@ -154,9 +154,7 @@ public class RobotContainer {
             m_robotDrive));
 
 
-    new JoystickButton(m_driverController, 1) 
-    .whileTrue(new InstantCommand(
-            () -> m_salus.set()));
+   
 
 
 
@@ -193,35 +191,61 @@ public class RobotContainer {
 
 
 
-            new JoystickButton(m_driverController2, 1)
+            new JoystickButton(m_driverController2, 4)
             .whileTrue(new RunCommand(() -> m_arm.goToFeeder(), m_arm));
 
+            
+
+            new JoystickButton(m_driverController2, 5)
+            .whileTrue(new RunCommand(() -> m_arm.goToPosition(2), m_arm));
+
+            new JoystickButton(m_driverController2, 6)
+            .whileTrue(new RunCommand(() -> m_arm.goToPosition(3), m_arm));
+
+
+
+            new JoystickButton(m_driverController2, 5)
+            .whileFalse(new RunCommand(() -> m_arm.dropFrom(2), m_arm));
+
+            new JoystickButton(m_driverController2, 6)
+            .whileFalse(new RunCommand(() -> m_arm.dropFrom(3), m_arm));
+
+            
+
+
+            new JoystickButton(m_driverController2, 8)
+            .whileTrue(new RunCommand(() -> m_arm.resetArm(), m_arm));
+            
+
                
+
         
             
-            
+
             
        
         //Algae Intake commands
-                new JoystickButton(m_driverController, 7)
-                .whileTrue(new InstantCommand(
-                        () -> AlageIntake.wheelsStop(), AlageIntake));
+                // new JoystickButton(m_driverController, 7)
+                // .whileTrue(new InstantCommand(
+                //         () -> AlageIntake.wheelsStop(), AlageIntake));
                 
-                new JoystickButton(m_driverController, 9)
-                .whileTrue(new InstantCommand(
-                        () -> AlageIntake.spinAlageWheels(-1), AlageIntake));
+                // new JoystickButton(m_driverController, 9)
+                // .whileTrue(new InstantCommand(
+                //         () -> AlageIntake.spinAlageWheels(-1), AlageIntake));
 
-                new JoystickButton(m_driverController, 11)
-                .whileTrue(new InstantCommand(
-                        () -> AlageIntake.spinAlageWheels(1), AlageIntake));
+                
 
-                new JoystickButton(m_driverController, 8)
+                new JoystickButton(m_driverController2, 1)
                 .onTrue(new RunCommand(
                         () -> AlageIntake.setActive(), AlageIntake));
 
-                new JoystickButton(m_driverController, 10)
+                new JoystickButton(m_driverController2, 2)
                 .onTrue(new RunCommand(
                         () -> AlageIntake.setIdle(), AlageIntake));
+
+                new JoystickButton(m_driverController2, 3)
+                .whileTrue(new InstantCommand(
+                        () -> AlageIntake.wheelSequence(), AlageIntake));
 
 
                 
@@ -230,6 +254,180 @@ public class RobotContainer {
 
 
   }
+
+
+  
+
+
+
+
+  public class moveStraight extends Command{
+    double startX;
+    DriveSubsystem m_robotDrive;
+    private double distance; // in meters
+
+    private int direction;
+
+    public moveStraight(DriveSubsystem m_robotDrive, double distance, int direction){
+      this.m_robotDrive = m_robotDrive;
+      this.distance = distance;
+      this.direction = direction;
+    }
+
+    @Override
+    public void initialize() {
+      startX = m_robotDrive.getPose().getX();
+    }
+
+    @Override
+    public void execute() {
+      m_robotDrive.drive(.05 * direction, 0.0, 0.0, false, .3); //-.02
+    }
+
+    @Override
+    public boolean isFinished() {
+        return Math.abs(m_robotDrive.getPose().getX() - startX) > (distance / 1.31);  //.045   .9
+    }
+
+  }
+
+
+  public class moveSide extends Command{
+    double startY;
+    DriveSubsystem m_robotDrive;
+    private double distance; // in meters
+
+    private int direction; // 1 for right?
+
+    public moveSide(DriveSubsystem m_robotDrive, double distance, int direction){
+      this.m_robotDrive = m_robotDrive;
+      this.distance = distance;
+      this.direction = direction;
+    }
+
+    @Override
+    public void initialize() {
+      startY = m_robotDrive.getPose().getY();
+    }
+
+    @Override
+    public void execute() {
+      m_robotDrive.drive(0.0, .05 * direction, 0.0, false, .3); //-.02
+    }
+
+    @Override
+    public boolean isFinished() {
+        return Math.abs(m_robotDrive.getPose().getY() - startY) > (distance / 1.31);  //.045   .9
+    }
+
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  public class moveArm extends Command{
+    
+    private Arm arm;
+    private int level;
+    
+
+    private int direction; // 1 for right?
+
+    public moveArm(Arm arm, int level, int direction){
+      addRequirements(arm);
+      this.arm = arm;
+      this.level = level;
+      this.direction = direction;
+    }
+
+    
+
+    @Override
+    public void initialize() {
+    }
+
+    @Override
+    public void execute() {
+      arm.goToPosition(level);
+    }
+
+    @Override
+    public boolean isFinished() {
+      return arm.checkConditions(level);
+    }
+
+  }
+
+  public class dropArm extends Command{
+    
+    private Arm arm;
+    private int level;
+    
+
+    public dropArm(Arm arm, int level){
+      addRequirements(arm);
+      this.arm = arm;
+      this.level = level;
+    }
+    
+
+    @Override
+    public void execute() {
+      arm.dropFrom(level);
+    }
+
+    @Override
+    public boolean isFinished() {
+      return arm.checkDrop(level);
+    }
+
+  }
+
+
+  // 1 for right side -1 for left side
+  public SequentialCommandGroup scoreCoral(int side, int level){
+    return new SequentialCommandGroup(
+        
+    // align to tag
+        new moveSide(m_robotDrive, .1651, 1),
+
+        new moveArm(m_arm, level, side),
+
+        new moveStraight(m_robotDrive, .1, 1),  //CHANGE .1!!! DUMMY VARIABLE
+
+        new dropArm(m_arm, level)
+
+    );
+  }
+
+
+  
+
+
+
+  
+
+   
+
+  
+
+
+  
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -281,6 +479,7 @@ public class RobotContainer {
 
 
   public void teloPeriodic(){
+       
   }
 
   int state = 0;
@@ -291,8 +490,9 @@ public class RobotContainer {
   // private RunCommand m_backwards = new RunCommand(() -> m_robotDrive.drive(-.6, 0, 0, false, 0.3), m_robotDrive);
   // private RunCommand m_lineUp = new RunCommand(() -> m_robotDrive.drive(0, m_salus.calcX(), m_salus.calcYaw() / 2, false, 0.3));
 
-
- 
+  public void teleopInit(){
+        
+  }
 
   public void autoInnit(){
     state=0;
@@ -300,13 +500,12 @@ public class RobotContainer {
     System.out.println(mode);
     intmode = (int) mode;
     startTime = System.currentTimeMillis();
-    m_salus.set();
+    
   }
 
 
 
   public void autonomousPeriodic(){
-    AHRS gyro = m_gyro.gyro();
     
     //commands
     RunCommand forward = new RunCommand(() -> m_robotDrive.drive(.6, 0, 0, false, 0.3), m_robotDrive);
@@ -317,6 +516,20 @@ public class RobotContainer {
               if(System.currentTimeMillis() - startTime > 1000){
                 CommandScheduler.getInstance().cancel(forward);
               }
+              break;
+
+              case(2):
+              
+              new SequentialCommandGroup(
+
+              new moveStraight(m_robotDrive, 1.524, 1),
+
+              scoreCoral(state, intmode)
+
+              
+
+              
+              ).schedule();
               break;
             
         }

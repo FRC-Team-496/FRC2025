@@ -16,26 +16,29 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class Arm extends SubsystemBase{
     
-    SparkMax armMotor;
-    SparkMax clawMotor;
+
+    int count = 0;
+
+    SparkMax armMotor = new SparkMax(51, MotorType.kBrushless);
+    SparkMax clawMotor = new SparkMax(53, MotorType.kBrushless);
 
     double armSpeed = .3;
     
     double clawSpeed = .15;
     
 
-    double[] coralTreeArmPositions = {0.0, 0.0, 0.0, 40.0};
+    double[] coralTreeArmPositions = {0.0, 20.0, 0.0, 130.0};
 
-    double feederArmPos = 80;
+    double feederArmPos = 85;
 
 //
     // add to go to level method
-    double[] coralTreeClawPositions = {1.0, 2.0, 3.0, 4.0}; 
+    double[] coralTreeClawPositions = {0.0, 4.0, 13.5, 15}; 
 
     double feederClawPos = 3.5;
     
 
-    double forwardLimit = 100;
+    double forwardLimit = 137;
     double reverseLimit = 0;
 
     RelativeEncoder armEncoder;
@@ -46,15 +49,12 @@ public class Arm extends SubsystemBase{
 
     public Arm(){
         
-        armMotor = new SparkMax(51, MotorType.kBrushless);
-        clawMotor = new SparkMax(53, MotorType.kBrushless);
+
 
         armEncoder = armMotor.getEncoder();
+        clawEncoder = clawMotor.getEncoder();
 
-
-        clawEncoder = armMotor.getEncoder();
-
-        resetEncoder();
+        
 
 
         armPid = new PIDController(.4, 0, 0);
@@ -69,11 +69,13 @@ public class Arm extends SubsystemBase{
         armConfig.softLimit.reverseSoftLimitEnabled(true);
         armMotor.configure(armConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+        
+
     }
 
     
     public void goToFeeder(){
-        //armMotor.set(MathUtil.clamp(armPid.calculate(armEncoder.getPosition(), feederArmPos), -.2, .2)); 
+        armMotor.set(MathUtil.clamp(armPid.calculate(armEncoder.getPosition(), feederArmPos), -.3, .3)); 
 
         clawMotor.set(MathUtil.clamp(clawPid.calculate(clawEncoder.getPosition(), feederClawPos), -.2, .2)); 
 
@@ -81,20 +83,79 @@ public class Arm extends SubsystemBase{
         SmartDashboard.putNumber("clawPostion", clawEncoder.getPosition());
         SmartDashboard.putNumber("armPostion", armEncoder.getPosition());
 
-        System.out.println(clawEncoder.getPosition());
     }
 
 
 
+    public void goToPosition(int level){
+        if((armEncoder.getPosition() > coralTreeArmPositions[level] - 3) && (armEncoder.getPosition() < coralTreeArmPositions[level] + 3)){
+            clawMotor.set(MathUtil.clamp(clawPid.calculate(clawEncoder.getPosition(), coralTreeClawPositions[level]), -.1, .1)); 
 
+        }
+      
+        
+        armMotor.set(MathUtil.clamp(armPid.calculate(armEncoder.getPosition(), coralTreeArmPositions[level]), -.3, .3)); 
+        System.out.println((armEncoder.getPosition() > coralTreeArmPositions[level] - 3) && (armEncoder.getPosition() < coralTreeArmPositions[level] + 3));
 
-
-    public void resetEncoder(){
-        clawEncoder.setPosition(0.0);
-        armEncoder.setPosition(0.0);
 
         SmartDashboard.putNumber("clawPostion", clawEncoder.getPosition());
         SmartDashboard.putNumber("armPostion", armEncoder.getPosition());
+
+    }
+
+    public boolean checkConditions(int level){
+        if(Math.abs(armEncoder.getPosition() - coralTreeArmPositions[level]) < 1 && Math.abs(clawEncoder.getPosition() - coralTreeClawPositions[level]) < 1){
+            return true;
+        }
+        
+        return false;
+    }
+
+    public boolean checkDrop(int level){
+        if(Math.abs(clawEncoder.getPosition() - (coralTreeClawPositions[level] - 3)) < 1){
+            return true;
+        }
+        
+        return false;
+    }
+
+    public void dropFrom(int level){
+
+        clawMotor.set(MathUtil.clamp(clawPid.calculate(clawEncoder.getPosition(), coralTreeClawPositions[level] - 3), -.2, .2));  // -2
+
+
+        SmartDashboard.putNumber("clawPostion", clawEncoder.getPosition());
+    }
+
+
+    public void resetArm(){
+        clawMotor.set(MathUtil.clamp(clawPid.calculate(clawEncoder.getPosition(), 0), -.2, .2));  // -2
+        armMotor.set(MathUtil.clamp(armPid.calculate(armEncoder.getPosition(), 0), -.3, .3));  // -2
+
+
+    }
+
+
+
+    public void armUp(){
+        armMotor.set(1);
+    }
+
+    public void armDown(){
+        armMotor.set(-1);
+    }
+
+    public void stopArm(){
+        armMotor.set(0);
+    }
+
+    public void resetEncoder(){
+        
+            clawEncoder.setPosition(0.0);
+            armEncoder.setPosition(0.0);
+
+            SmartDashboard.putNumber("clawPostion", clawEncoder.getPosition());
+            SmartDashboard.putNumber("armPostion", armEncoder.getPosition());
 
     }
 

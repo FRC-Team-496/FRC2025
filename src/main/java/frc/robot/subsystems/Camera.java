@@ -17,7 +17,7 @@ public class Camera extends SubsystemBase {
     private static int neuralNetworkpipelineId;
 
     public void startCamera() {
-        NetworkTable armTable = NetworkTableInstance.getDefault().getTable("limelight-arm");
+        NetworkTable armTable = NetworkTableInstance.getDefault().getTable("limelight-algae");
         NetworkTableEntry tx = armTable.getEntry("tx");
         NetworkTableEntry ty = armTable.getEntry("ty");
         NetworkTableEntry ta = armTable.getEntry("ta");
@@ -26,7 +26,7 @@ public class Camera extends SubsystemBase {
         int aprilTagID =  (int) armTable.getEntry("tid").getDouble(-1);
         detected_ID = aprilTagID;
         
-        
+        SmartDashboard.putNumber("tag ID", aprilTagID);
         //read values periodically
         double x = tx.getDouble(0.0);
         statX = x;
@@ -36,24 +36,35 @@ public class Camera extends SubsystemBase {
         double[] bot = botpose.getDoubleArray(new double[6]);
         statYaw = bot[5];
 
+
+        
+        double[] tagToCamera = armTable.getEntry("targetpose_cameraspace").getDoubleArray(new double[6]);
+
+        SmartDashboard.putNumber("tx Tag", tagToCamera[0]);
+        SmartDashboard.putNumber("ty Tag", tagToCamera[1]);
+        SmartDashboard.putNumber("tz Tag", tagToCamera[2]);
+        SmartDashboard.putNumber("pitch Tag", tagToCamera[3]);
+        SmartDashboard.putNumber("yaw Tag", tagToCamera[4]);
+        SmartDashboard.putNumber("roll Tag", tagToCamera[5]);
+
+
+      
         //System.out.println(getDetected_ID() == 7);
         //post to smart dashboard periodically
-        SmartDashboard.putNumber("LimelightX", x);
-        SmartDashboard.putNumber("LimelightY", y);
-        SmartDashboard.putNumber("LimelightArea", area);
-        SmartDashboard.putNumber("LimelightBotX", bot[0]);
-        SmartDashboard.putNumber("LimelightBotY", bot[1]);
-        SmartDashboard.putNumber("LimelightBotZ", bot[2]);
-        SmartDashboard.putNumber("zLimelightBotRoll", bot[3]);
-        SmartDashboard.putNumber("LimelightBotPitch", bot[4]);
-        SmartDashboard.putNumber("LimelightBotYaw", bot[5]);
-        pipeline.setNumber(cameraPipelineID);
+        // SmartDashboard.putNumber("LimelightX", x);
+        // SmartDashboard.putNumber("LimelightY", y);
+        // SmartDashboard.putNumber("LimelightArea", area);
+        // SmartDashboard.putNumber("LimelightBotX", bot[0]);
+        // SmartDashboard.putNumber("LimelightBotY", bot[1]);
+        // SmartDashboard.putNumber("LimelightBotZ", bot[2]);
+        // SmartDashboard.putNumber("zLimelightBotRoll", bot[3]);
+        // SmartDashboard.putNumber("LimelightBotPitch", bot[4]);
+        // SmartDashboard.putNumber("LimelightBotYaw", bot[5]);
         
         SmartDashboard.putNumber("Tag ID", aprilTagID);
 
 
-        NetworkTable algaeTable = NetworkTableInstance.getDefault().getTable("limelight-algae");
-        SmartDashboard.putNumber("LimelightXAlgae", algaeTable.getEntry("tx").getDouble(10.0));
+        
     }
 
 

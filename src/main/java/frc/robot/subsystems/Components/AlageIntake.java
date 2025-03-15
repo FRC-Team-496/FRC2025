@@ -19,7 +19,6 @@ public class AlageIntake extends SubsystemBase{
     SparkMax m_intake;
     PIDController pid;
 
-    double wheelsLockPos;
 
     double activePos = -40;
 
@@ -28,9 +27,10 @@ public class AlageIntake extends SubsystemBase{
     RelativeEncoder encoder;
     RelativeEncoder wheelEncoder;
 
-    boolean wheelsOn = true;
 
-    int algaeSequence = 0;
+
+    int wheelSequence = 0;
+
     // RelativeEncoder tempEncoder;
     
     
@@ -63,8 +63,7 @@ public class AlageIntake extends SubsystemBase{
 
     public void setActive(){
         
-        //System.out.println("run");
-        //SmartDashboard.putNumber("Intake PID speed", pid.calculate(encoder.getPosition(), -35)); //-35
+     
         SmartDashboard.putNumber("EncoderPosition", encoder.getPosition());
         
 
@@ -74,43 +73,26 @@ public class AlageIntake extends SubsystemBase{
 
     public void setIdle(){
         
-        //System.out.println("run");
-        //SmartDashboard.putNumber("Intake PID speed", pid.calculate(encoder.getPosition(), -35)); //-35
+        
         SmartDashboard.putNumber("EncoderPosition", encoder.getPosition());
 
         m_intake.set(MathUtil.clamp(pid.calculate(encoder.getPosition(), idlePos), -.2, .2)); //-35
     }
 
 
-    public void setWheels(){
-        System.out.println("run");
-        if(wheelsOn){
-            spinAlageWheels(1);
-        
+    public void wheelSequence(){
+        if(wheelSequence == 0){
+            m_wheels.set(-1);
         }
-        else{
-            wheelsStop();
-            
+        else if(wheelSequence == 1){
+            m_wheels.set(1);
         }
+        else if(wheelSequence == 2){
+            m_wheels.set(0);
+        }
+
+        wheelSequence = (wheelSequence + 1) % 3;
     }
-
-
-    public void AlgaeSequence(){
-        if(algaeSequence == 0){
-            
-        }
-        else if(algaeSequence == 1){
-
-        }
-        else if(algaeSequence == 2){
-
-        }
-        else if(algaeSequence == 3){
-
-        }
-
-        algaeSequence = algaeSequence + 1 % 4;
-    } 
 
 
 
