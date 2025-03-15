@@ -16,7 +16,7 @@ public class Climber extends SubsystemBase{
     //SparkMax m_motor2;
 
     TalonFX m_kraken;
-    double speed = .05;
+    
     
     public Climber(){
         //m_motor1 = new SparkMax(20, MotorType.kBrushless);
@@ -30,9 +30,13 @@ public class Climber extends SubsystemBase{
     // Encoder object created to display position values
     
    
-    public void extend(int dir){
-         m_kraken.set(speed * dir);
+    public void retract(){
+         m_kraken.set(.4);
     }
+
+    public void extend(){
+        m_kraken.set(-.6);
+   }
 
     public void stop(){
          m_kraken.set(0);

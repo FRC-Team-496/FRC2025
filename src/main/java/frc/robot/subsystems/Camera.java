@@ -16,6 +16,8 @@ public class Camera extends SubsystemBase {
     private static int cameraPipelineID = 0;
     private static int neuralNetworkpipelineId;
 
+    private static double[] tagToCamera;
+
     public void startCamera() {
         NetworkTable armTable = NetworkTableInstance.getDefault().getTable("limelight-algae");
         NetworkTableEntry tx = armTable.getEntry("tx");
@@ -37,7 +39,7 @@ public class Camera extends SubsystemBase {
         statYaw = bot[5];
 
 
-        
+
         double[] tagToCamera = armTable.getEntry("targetpose_cameraspace").getDoubleArray(new double[6]);
 
         SmartDashboard.putNumber("tx Tag", tagToCamera[0]);
@@ -83,5 +85,20 @@ public class Camera extends SubsystemBase {
 
     public static double getY(){
         return statY;
+    }
+
+
+
+
+    public static double getDistX(){
+        return NetworkTableInstance.getDefault().getTable("limelight-algae").getEntry("targetpose_cameraspace").getDoubleArray(new double[6])[0];
+    }
+
+    public static double getDistYaw(){
+        return NetworkTableInstance.getDefault().getTable("limelight-algae").getEntry("targetpose_cameraspace").getDoubleArray(new double[6])[1];
+    }
+
+    public static double getDistY(){
+        return NetworkTableInstance.getDefault().getTable("limelight-algae").getEntry("targetpose_cameraspace").getDoubleArray(new double[6])[2];
     }
 }

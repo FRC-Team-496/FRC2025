@@ -50,27 +50,30 @@ public class SALUS {
     }
 
 
-    
     public double calcY(){
         
-        double y = Camera.getY();
-        if(y > 0 && y < 160){
-            return speed;
-        }
-        else if(y < 0 && y > -160){
+        double y = Camera.getY() - 1;
+        if(y > 20){
             return -speed;
         }
-        else if(y < -160 && y > -178){
-            return -(y + 180.0) / 50.0;
+        else if(y < -20){
+            return speed;
         }
-        else if(y > 160 && y < 178){
-            return -(y - 180.0) / 50.0;
+        else if(y < 20 && y > 0){
+            return -y / 50.0;
         }
-        else{
-            return 0.0;
+        else if( y > -20 && y < 0){
+            return -y / 50.0;
         }
+       
     
+    return 0.0;
 }
+
+
+    
+    
+    
 
     
 }

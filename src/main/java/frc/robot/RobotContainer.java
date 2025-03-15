@@ -150,7 +150,7 @@ public class RobotContainer {
     // SALUS, button 1 driver controller (Back trigger)
     new JoystickButton(m_driverController, 1) //SALUS
     .whileTrue(new RunCommand(
-            () -> m_robotDrive.drive(0, m_salus.calcX(), m_salus.calcYaw() / 2, false, 0.3), 
+            () -> m_robotDrive.drive(m_salus.calcY(), m_salus.calcX(), m_salus.calcYaw() / 2, false, 0.3), 
             m_robotDrive));
 
 
@@ -161,11 +161,11 @@ public class RobotContainer {
     // Climbers, buttons 3 and 5 driver controller
     new JoystickButton(m_driverController, 5)
       .whileTrue(new InstantCommand(
-             () -> m_climbers.extend(1), m_climbers));
+             () -> m_climbers.extend(), m_climbers));
 
     new JoystickButton(m_driverController, 3)
      .whileTrue(new InstantCommand(
-             () -> m_climbers.extend(-1), m_climbers));
+             () -> m_climbers.retract(), m_climbers));
 
     new JoystickButton(m_driverController, 3)
     .whileFalse(new InstantCommand(
@@ -281,7 +281,7 @@ public class RobotContainer {
 
     @Override
     public void execute() {
-      m_robotDrive.drive(.05 * direction, 0.0, 0.0, false, .3); //-.02
+      m_robotDrive.drive(.6 * direction, 0.0, 0.0, false, .3); //-.02
     }
 
     @Override
@@ -312,12 +312,49 @@ public class RobotContainer {
 
     @Override
     public void execute() {
-      m_robotDrive.drive(0.0, .05 * direction, 0.0, false, .3); //-.02
+      m_robotDrive.drive(0.0, .3 * direction, 0.0, false, .3); //-.02
     }
 
     @Override
     public boolean isFinished() {
         return Math.abs(m_robotDrive.getPose().getY() - startY) > (distance / 1.31);  //.045   .9
+    }
+
+  }
+
+
+  public class turn extends Command{
+    double yawDiff;
+    DriveSubsystem m_robotDrive;
+    private double angle; // in radians (maybe?)
+    double startingYaw;
+    private int direction; // 1 for right?
+
+
+    // 1 for clockwise, -1 for counter clockwise? (maybe?)
+
+    public turn(DriveSubsystem m_robotDrive, double angle, int direction){
+      this.m_robotDrive = m_robotDrive;
+      this.angle = angle;
+      this.direction = direction;
+ 
+    }
+
+    @Override
+    public void initialize() {
+      startingYaw = Camera.getYaw();
+    }
+
+    @Override
+    public void execute() {
+      
+      m_robotDrive.drive(0.0, 0.0, 2 * direction, false, .3); // maybe add field relative true?
+      yawDiff = Math.abs(Camera.getYaw() - startingYaw);
+    }
+
+    @Override
+    public boolean isFinished() {
+        return Math.abs(yawDiff - angle) < (1);  //add directional component
     }
 
   }
@@ -404,15 +441,31 @@ public class RobotContainer {
     return new SequentialCommandGroup(
         
     // align to tag
+
+        alignToTag(),
+
         new moveSide(m_robotDrive, .1651, 1),
 
         new moveArm(m_arm, level, side),
 
-        new moveStraight(m_robotDrive, .1, 1),  //CHANGE .1!!! DUMMY VARIABLE
+        new moveStraight(m_robotDrive, .848, 1),  
 
         new dropArm(m_arm, level)
 
     );
+  }
+
+
+  public SequentialCommandGroup alignToTag(){
+        return new SequentialCommandGroup(
+
+            new moveSide(m_robotDrive, Camera.getDistX(), (int) MathUtil.clamp(Camera.getDistX(), -1, 1)),
+            
+            new moveStraight(m_robotDrive, Camera.getDistY() - 1, (int) MathUtil.clamp(Camera.getDistY() - 1, -1, 1))
+
+        );  
+    
+    
   }
 
 
@@ -496,7 +549,7 @@ public class RobotContainer {
 
   public void autoInnit(){
     state=0;
-    mode = SmartDashboard.getNumber("Autonomous Mode", 1.0);
+    mode = 2; //SmartDashboard.getNumber("Autonomous Mode", 1.0);
     System.out.println(mode);
     intmode = (int) mode;
     startTime = System.currentTimeMillis();
@@ -512,26 +565,31 @@ public class RobotContainer {
     
         switch(intmode) {
             case(1):
-              forward.schedule();
-              if(System.currentTimeMillis() - startTime > 1000){
-                CommandScheduler.getInstance().cancel(forward);
-              }
-              break;
+              new SequentialCommandGroup(
 
-              case(2):
+              new moveStraight(m_robotDrive, 4.61, 1),
+
+
+
+              scoreCoral(1, 3)
+
+              ).schedule();
+              
+              break;
+            case(2):
               
               new SequentialCommandGroup(
 
               new moveStraight(m_robotDrive, 1.524, 1),
 
-              scoreCoral(state, intmode)
+              new turn(m_robotDrive, 150 * Math.PI / 180, 1),
 
-              
+              scoreCoral(1, 3)
 
-              
               ).schedule();
+              
               break;
-            
+
         }
     }
 }

@@ -20,9 +20,9 @@ public class AlageIntake extends SubsystemBase{
     PIDController pid;
 
 
-    double activePos = -40;
+    double activePos = -22;
 
-    double idlePos = -15; //?
+    double idlePos = -1; //?
     
     RelativeEncoder encoder;
     RelativeEncoder wheelEncoder;
