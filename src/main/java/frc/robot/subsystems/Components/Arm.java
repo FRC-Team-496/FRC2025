@@ -29,7 +29,7 @@ public class Arm extends SubsystemBase{
 
     double[] coralTreeArmPositions = {0.0, 20.0, 0.0, 130.0};
 
-    double feederArmPos = 85;
+    double feederArmPos = 83;
 
 //
     // add to go to level method
@@ -69,7 +69,17 @@ public class Arm extends SubsystemBase{
         armConfig.softLimit.reverseSoftLimitEnabled(true);
         armMotor.configure(armConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+        SparkMaxConfig clawConfig = new SparkMaxConfig();
+
+        clawConfig.softLimit.reverseSoftLimit(0);
+        clawConfig.softLimit.reverseSoftLimitEnabled(true);
+        clawMotor.configure(clawConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
         
+        armEncoder.setPosition(0);
+        clawEncoder.setPosition(0);
+
+        SmartDashboard.putNumber("clawPostion", clawEncoder.getPosition());
+        SmartDashboard.putNumber("armPostion", armEncoder.getPosition());
 
     }
 
@@ -89,13 +99,12 @@ public class Arm extends SubsystemBase{
 
     public void goToPosition(int level){
         if((armEncoder.getPosition() > coralTreeArmPositions[level] - 3) && (armEncoder.getPosition() < coralTreeArmPositions[level] + 3)){
-            clawMotor.set(MathUtil.clamp(clawPid.calculate(clawEncoder.getPosition(), coralTreeClawPositions[level]), -.1, .1)); 
+            clawMotor.set(MathUtil.clamp(clawPid.calculate(clawEncoder.getPosition(), coralTreeClawPositions[level]), -.15, .15)); 
 
         }
       
         
         armMotor.set(MathUtil.clamp(armPid.calculate(armEncoder.getPosition(), coralTreeArmPositions[level]), -.3, .3)); 
-        System.out.println((armEncoder.getPosition() > coralTreeArmPositions[level] - 3) && (armEncoder.getPosition() < coralTreeArmPositions[level] + 3));
 
 
         SmartDashboard.putNumber("clawPostion", clawEncoder.getPosition());
@@ -105,6 +114,14 @@ public class Arm extends SubsystemBase{
 
     public boolean checkConditions(int level){
         if(Math.abs(armEncoder.getPosition() - coralTreeArmPositions[level]) < 1 && Math.abs(clawEncoder.getPosition() - coralTreeClawPositions[level]) < 1){
+            return true;
+        }
+        
+        return false;
+    }
+
+    public boolean checkFeederConditions(){
+        if(Math.abs(armEncoder.getPosition() - feederArmPos) == 0 && Math.abs(clawEncoder.getPosition() - feederClawPos) == 0){
             return true;
         }
         
@@ -121,7 +138,7 @@ public class Arm extends SubsystemBase{
 
     public void dropFrom(int level){
 
-        clawMotor.set(MathUtil.clamp(clawPid.calculate(clawEncoder.getPosition(), coralTreeClawPositions[level] - 3), -.2, .2));  // -2
+        clawMotor.set(MathUtil.clamp(clawPid.calculate(clawEncoder.getPosition(), coralTreeClawPositions[level] - 3), -.1, .1));  // -2
 
 
         SmartDashboard.putNumber("clawPostion", clawEncoder.getPosition());

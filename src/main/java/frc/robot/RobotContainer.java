@@ -52,6 +52,8 @@ public class RobotContainer {
   private SendableChooser<Integer> m_chooser = new SendableChooser<Integer>(); 
   private final Arm m_arm = new Arm();
 
+  private int autoScheduler = 0;
+
 
 //   private final Pixy2 m_pixy = new Pixy2();
   Thread m_visionThread;
@@ -148,10 +150,21 @@ public class RobotContainer {
 
 
     // SALUS, button 1 driver controller (Back trigger)
-    new JoystickButton(m_driverController, 1) //SALUS
-    .whileTrue(new RunCommand(
-            () -> m_robotDrive.drive(m_salus.calcY(), m_salus.calcX(), m_salus.calcYaw() / 2, false, 0.3), 
-            m_robotDrive));
+
+    new JoystickButton(m_driverController, 3) //SALUS
+    .whileTrue(new RunCommand(() -> m_robotDrive.drive(0, m_salus.calcX(), m_salus.calcYaw() / 2, false, 0.3)));
+
+    // new JoystickButton(m_driverController, 3) //SALUS
+    // .whileTrue(new SequentialCommandGroup(
+    //   new lineUp(m_robotDrive),
+
+    //   new moveStraight(m_robotDrive, Camera.getDistZ(), 1)
+
+    // ));
+
+            new JoystickButton(m_driverController, 3) //SALUS
+    .whileTrue(new InstantCommand(
+           () -> m_salus.set()));
 
 
    
@@ -159,18 +172,18 @@ public class RobotContainer {
 
 
     // Climbers, buttons 3 and 5 driver controller
-    new JoystickButton(m_driverController, 5)
+    new JoystickButton(m_driverController, 2)
       .whileTrue(new InstantCommand(
              () -> m_climbers.extend(), m_climbers));
 
-    new JoystickButton(m_driverController, 3)
+    new JoystickButton(m_driverController, 1)
      .whileTrue(new InstantCommand(
              () -> m_climbers.retract(), m_climbers));
 
-    new JoystickButton(m_driverController, 3)
+    new JoystickButton(m_driverController, 2)
     .whileFalse(new InstantCommand(
             () -> m_climbers.stop(), m_climbers));
-    new JoystickButton(m_driverController, 5)
+    new JoystickButton(m_driverController, 1)
     .whileFalse(new InstantCommand(
             () -> m_climbers.stop(), m_climbers));
 
@@ -191,23 +204,25 @@ public class RobotContainer {
 
 
 
-            new JoystickButton(m_driverController2, 4)
-            .whileTrue(new RunCommand(() -> m_arm.goToFeeder(), m_arm));
+            // new JoystickButton(m_driverController2, 7)
+            // .whileTrue(new RunCommand(() -> m_arm.goToFeeder(), m_arm));
 
             
 
-            new JoystickButton(m_driverController2, 5)
+            new JoystickButton(m_driverController2, 6)
             .whileTrue(new RunCommand(() -> m_arm.goToPosition(2), m_arm));
 
-            new JoystickButton(m_driverController2, 6)
+            new JoystickButton(m_driverController2, 5)
             .whileTrue(new RunCommand(() -> m_arm.goToPosition(3), m_arm));
 
+            
 
 
-            new JoystickButton(m_driverController2, 5)
-            .whileFalse(new RunCommand(() -> m_arm.dropFrom(2), m_arm));
 
             new JoystickButton(m_driverController2, 6)
+            .whileFalse(new RunCommand(() -> m_arm.dropFrom(2), m_arm));
+
+            new JoystickButton(m_driverController2, 5)
             .whileFalse(new RunCommand(() -> m_arm.dropFrom(3), m_arm));
 
             
@@ -217,7 +232,25 @@ public class RobotContainer {
             .whileTrue(new RunCommand(() -> m_arm.resetArm(), m_arm));
             
 
-               
+
+
+            // new JoystickButton(m_driverController, 3) // TEST WIT APRIL TAG
+            // .whileTrue(scoreCoral(1, 3));
+
+            new JoystickButton(m_driverController2, 7) // TEST WIT APRIL TAG
+            .whileTrue(new SequentialCommandGroup(
+            
+              //alignToTag(),
+
+              new moveStraight(m_robotDrive, .2, -1),
+
+              new intake(m_arm),
+
+              new moveStraight(m_robotDrive, .1, 1)
+
+              
+            ));
+            
 
         
             
@@ -286,7 +319,7 @@ public class RobotContainer {
 
     @Override
     public boolean isFinished() {
-        return Math.abs(m_robotDrive.getPose().getX() - startX) > (distance / 1.31);  //.045   .9
+        return Math.abs(m_robotDrive.getPose().getX() - startX) > (distance / 1.31);  
     }
 
   }
@@ -383,13 +416,11 @@ public class RobotContainer {
     private int level;
     
 
-    private int direction; // 1 for right?
 
-    public moveArm(Arm arm, int level, int direction){
+    public moveArm(Arm arm, int level){
       addRequirements(arm);
       this.arm = arm;
       this.level = level;
-      this.direction = direction;
     }
 
     
@@ -406,6 +437,35 @@ public class RobotContainer {
     @Override
     public boolean isFinished() {
       return arm.checkConditions(level);
+    }
+
+  }
+
+  public class intake extends Command{
+    
+    private Arm arm;
+    
+
+
+    public intake(Arm arm){
+      addRequirements(arm);
+      this.arm = arm;
+    }
+
+    
+
+    @Override
+    public void initialize() {
+    }
+
+    @Override
+    public void execute() {
+      arm.goToFeeder();
+    }
+
+    @Override
+    public boolean isFinished() {
+      return arm.checkFeederConditions();
     }
 
   }
@@ -436,19 +496,36 @@ public class RobotContainer {
   }
 
 
+  
+
+
   // 1 for right side -1 for left side
   public SequentialCommandGroup scoreCoral(int side, int level){
     return new SequentialCommandGroup(
         
     // align to tag
 
-        alignToTag(),
+        //alignToTag(),
+
+        new lineUp(m_robotDrive),
+
+        new moveStraight(m_robotDrive, Camera.getDistZ(), (int) Math.signum(Camera.getDistZ())),
+
+
+
+        new WaitCommand(1.0),
 
         new moveSide(m_robotDrive, .1651, 1),
 
-        new moveArm(m_arm, level, side),
+        new WaitCommand(1.0),
+
+        new moveArm(m_arm, level),
+
+        new WaitCommand(1.0),
 
         new moveStraight(m_robotDrive, .848, 1),  
+
+        new WaitCommand(1.0),
 
         new dropArm(m_arm, level)
 
@@ -456,17 +533,48 @@ public class RobotContainer {
   }
 
 
-  public SequentialCommandGroup alignToTag(){
-        return new SequentialCommandGroup(
+  public class lineUp extends Command{
+    double startY;
+    DriveSubsystem m_robotDrive;
 
-            new moveSide(m_robotDrive, Camera.getDistX(), (int) MathUtil.clamp(Camera.getDistX(), -1, 1)),
-            
-            new moveStraight(m_robotDrive, Camera.getDistY() - 1, (int) MathUtil.clamp(Camera.getDistY() - 1, -1, 1))
 
-        );  
-    
-    
+
+    public lineUp(DriveSubsystem m_robotDrive){
+      this.m_robotDrive = m_robotDrive;
+    }
+
+    @Override
+    public void initialize() {
+
+    }
+
+    @Override
+    public void execute() {
+      m_robotDrive.drive(0, m_salus.calcX(), m_salus.calcYaw() / 2, false, 0.3);
+    }
+
+    @Override
+    public boolean isFinished() {
+        return Camera.getDistX() < .02 && Camera.getDistYaw() < 1 && Camera.getDistYaw() > -1 ;  //.045   .9
+    }
+
   }
+
+
+  // public SequentialCommandGroup alignToTag(){
+  //       return new SequentialCommandGroup(
+
+  //           new moveSide(m_robotDrive, Camera.getDistX(), (int) MathUtil.clamp(Camera.getDistX(), -1, 1)),
+            
+  //           new moveStraight(m_robotDrive, Camera.getDistY() - 1, (int) MathUtil.clamp(Camera.getDistY() - 1, -1, 1))
+
+  //       );  
+    
+    
+  // }
+
+
+  
 
 
   
@@ -549,10 +657,19 @@ public class RobotContainer {
 
   public void autoInnit(){
     state=0;
-    mode = 2; //SmartDashboard.getNumber("Autonomous Mode", 1.0);
+    mode = SmartDashboard.getNumber("Autonomous Mode", 1.0);
     System.out.println(mode);
     intmode = (int) mode;
     startTime = System.currentTimeMillis();
+
+    // SequentialCommandGroup case1 = new SequentialCommandGroup(
+    // new moveStraight(m_robotDrive, 1, 1),
+    // new WaitCommand(3.0),
+    // scoreCoral(1, 3) // 3 is level 4
+    // );
+
+    //m_robotDrive.drive(0, 1, 0, false, .3);
+
     
   }
 
@@ -560,37 +677,80 @@ public class RobotContainer {
 
   public void autonomousPeriodic(){
     
+    RunCommand forward = new RunCommand(() -> m_robotDrive.drive(.4, 0, 0, false, 0.3), m_robotDrive);
+    // Command moveArm = new moveArm(m_arm, 3);
+    // Command moveBack = new moveStraight(m_robotDrive, .3, -1);
+    // Command dropArm = new dropArm(m_arm, 3);
+    // if(System.currentTimeMillis() - startTime < 3000){
+    //   moveArm.schedule();
+    //   forward.schedule();
+      
+    // }
+  
+    // if(System.currentTimeMillis() - startTime > 3000){
+    //   CommandScheduler.getInstance().cancel(forward);
+    //   moveBack.schedule();
+      
+    // }
+
+    // if(System.currentTimeMillis() - startTime > 4000){
+    //   dropArm.schedule();
+    // }
+
+
+    forward.schedule();
+    if(System.currentTimeMillis() - startTime > 3000){
+      CommandScheduler.getInstance().cancel(forward);
+
+
+
+
     //commands
-    RunCommand forward = new RunCommand(() -> m_robotDrive.drive(.6, 0, 0, false, 0.3), m_robotDrive);
-    
-        switch(intmode) {
-            case(1):
-              new SequentialCommandGroup(
+    // RunCommand forward = new RunCommand(() -> m_robotDrive.drive(.6, 0, 0, false, 0.3), m_robotDrive);
+    // SequentialCommandGroup case1 = new SequentialCommandGroup(
+    // new moveStraight(m_robotDrive, .3, 1),
+    // new WaitCommand(3.0),
+    // scoreCoral(1, 3) // 3 is level 4
+    // );
 
-              new moveStraight(m_robotDrive, 4.61, 1),
-
-
-
-              scoreCoral(1, 3)
-
-              ).schedule();
+    //     switch(intmode) {
+    //         case(1):
+    //         if(!case1.isScheduled()){
+    //           case1.schedule();
+    //         }
               
-              break;
-            case(2):
               
-              new SequentialCommandGroup(
-
-              new moveStraight(m_robotDrive, 1.524, 1),
-
-              new turn(m_robotDrive, 150 * Math.PI / 180, 1),
-
-              scoreCoral(1, 3)
-
-              ).schedule();
+    //           break;
+    //         case(2):
               
-              break;
+    //           new SequentialCommandGroup(
 
-        }
+    //           new moveStraight(m_robotDrive, 1.524, 1), //wy 1.5?? this is wrong
+
+    //           new turn(m_robotDrive, 150 * Math.PI / 180, 1),
+
+    //           scoreCoral(1, 3),
+
+    //           new moveStraight(m_robotDrive, 1, -1),
+
+    //           new turn(m_robotDrive, Math.PI, 1),
+
+    //           // feeder
+    //           alignToTag(),
+
+    //           new moveStraight(m_robotDrive, .7, 1) //UNFINISHED
+
+              
+
+
+
+    //           ).schedule();
+
+              
+              
+    //           break;
+
+         }
     }
 }
 

@@ -95,10 +95,12 @@ public class Camera extends SubsystemBase {
     }
 
     public static double getDistYaw(){
-        return NetworkTableInstance.getDefault().getTable("limelight-algae").getEntry("targetpose_cameraspace").getDoubleArray(new double[6])[1];
+        return NetworkTableInstance.getDefault().getTable("limelight-algae").getEntry("targetpose_cameraspace").getDoubleArray(new double[6])[4];
     }
 
-    public static double getDistY(){
+    public static double getDistZ(){
         return NetworkTableInstance.getDefault().getTable("limelight-algae").getEntry("targetpose_cameraspace").getDoubleArray(new double[6])[2];
     }
+
+    
 }
