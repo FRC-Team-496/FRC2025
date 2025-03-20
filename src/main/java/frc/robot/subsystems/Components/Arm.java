@@ -73,6 +73,8 @@ public class Arm extends SubsystemBase{
 
         clawConfig.softLimit.reverseSoftLimit(0);
         clawConfig.softLimit.reverseSoftLimitEnabled(true);
+        // clawConfig.softLimit.forwardSoftLimit(?);
+        // clawConfig.softLimit.forwardSoftLimitEnabled(true);
         clawMotor.configure(clawConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
         
         armEncoder.setPosition(0);

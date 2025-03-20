@@ -238,19 +238,10 @@ public class RobotContainer {
             // .whileTrue(scoreCoral(1, 3));
 
             new JoystickButton(m_driverController2, 7) // TEST WIT APRIL TAG
-            .whileTrue(new SequentialCommandGroup(
-            
-              //alignToTag(),
-
-              new moveStraight(m_robotDrive, .2, -1),
-
-              new intake(m_arm),
-
-              new moveStraight(m_robotDrive, .1, 1)
+            .whileTrue(new RunCommand(() -> m_arm.goToFeeder(), m_arm)
 
               
-            ));
-            
+            );            
 
         
             
@@ -279,6 +270,8 @@ public class RobotContainer {
                 new JoystickButton(m_driverController2, 3)
                 .whileTrue(new InstantCommand(
                         () -> AlageIntake.wheelSequence(), AlageIntake));
+
+       
 
 
                 
@@ -697,7 +690,6 @@ public class RobotContainer {
     //   dropArm.schedule();
     // }
 
-
     forward.schedule();
     if(System.currentTimeMillis() - startTime > 3000){
       CommandScheduler.getInstance().cancel(forward);
@@ -750,8 +742,9 @@ public class RobotContainer {
               
     //           break;
 
-         }
+    //     }
     }
+}
 }
 
 
