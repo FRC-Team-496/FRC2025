@@ -33,7 +33,7 @@ public class Arm extends SubsystemBase{
 
 //
     // add to go to level method
-    double[] coralTreeClawPositions = {0.0, 4.0, 13.5, 15}; 
+    double[] coralTreeClawPositions = {0.0, 4.0, 14, 15}; 
 
     double feederClawPos = 3.5;
     

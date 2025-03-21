@@ -27,7 +27,7 @@ public class AlageIntake extends SubsystemBase{
     RelativeEncoder encoder;
     RelativeEncoder wheelEncoder;
 
-
+    double wheelsLockPos;
 
     int wheelSequence = 0;
 
@@ -41,12 +41,12 @@ public class AlageIntake extends SubsystemBase{
         encoder = m_intake.getEncoder();
         wheelEncoder = m_wheels.getEncoder();
 
-        
+        wheelEncoder.setPosition(0);
         encoder.setPosition(0);
+
         SmartDashboard.putNumber("starting pos",encoder.getPosition());
 
-        // tempEncoder = m_wheels.getEncoder();
-        // tempEncoder.setPosition(0);
+        
        
         pid = new PIDController(.3, 0, 0);  // .3, .5, .3
 
@@ -82,16 +82,20 @@ public class AlageIntake extends SubsystemBase{
 
     public void wheelSequence(){
         if(wheelSequence == 0){
-            m_wheels.set(-1);
+            m_wheels.set(-.7);
         }
+        
         else if(wheelSequence == 1){
-            m_wheels.set(1);
+            getLockPosition();
         }
         else if(wheelSequence == 2){
+            m_wheels.set(.4);
+        }
+        else if(wheelSequence == 3){
             m_wheels.set(0);
         }
 
-        wheelSequence = (wheelSequence + 1) % 3;
+        wheelSequence = (wheelSequence + 1) % 4;
     }
 
 
@@ -107,13 +111,18 @@ public class AlageIntake extends SubsystemBase{
     }
 
 
-    // public void getEncoderPosition(){
-    //     wheelsLockPos = wheelEncoder.getPosition();
-    // }
+    public void getLockPosition(){
+        wheelsLockPos = wheelEncoder.getPosition();
+    }
 
-    // public void lockMotors(){
-    //     m_wheels.set(MathUtil.clamp(pid.calculate(encoder.getPosition(), wheelsLockPos), -.2, .2));
-    // }
+    public void lockMotors(){ // IDKI IF THIS WORKS
+        if(wheelSequence == 2){
+            m_wheels.set(MathUtil.clamp(pid.calculate(wheelEncoder.getPosition(), wheelsLockPos), -.2, .2));
+            
+
+
+        }
+    }
 
     
 

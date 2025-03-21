@@ -271,6 +271,10 @@ public class RobotContainer {
                 .whileTrue(new InstantCommand(
                         () -> AlageIntake.wheelSequence(), AlageIntake));
 
+                        new JoystickButton(m_driverController2, 3)
+                .whileTrue(new RunCommand(
+                        () -> AlageIntake.lockMotors(), AlageIntake));
+
        
 
 
@@ -670,32 +674,33 @@ public class RobotContainer {
 
   public void autonomousPeriodic(){
     
-    RunCommand forward = new RunCommand(() -> m_robotDrive.drive(.4, 0, 0, false, 0.3), m_robotDrive);
-    // Command moveArm = new moveArm(m_arm, 3);
-    // Command moveBack = new moveStraight(m_robotDrive, .3, -1);
-    // Command dropArm = new dropArm(m_arm, 3);
-    // if(System.currentTimeMillis() - startTime < 3000){
-    //   moveArm.schedule();
-    //   forward.schedule();
-      
-    // }
-  
+    // RunCommand forward = new RunCommand(() -> m_robotDrive.drive(.4, 0, 0, false, 0.3), m_robotDrive);
+    
+    // forward.schedule();
     // if(System.currentTimeMillis() - startTime > 3000){
     //   CommandScheduler.getInstance().cancel(forward);
-    //   moveBack.schedule();
-      
     // }
 
-    // if(System.currentTimeMillis() - startTime > 4000){
-    //   dropArm.schedule();
-    // }
+    RunCommand forward = new RunCommand(() -> m_robotDrive.drive(.4, 0, 0, false, 0.3), m_robotDrive);
+    
+    Command moveArm = new moveArm(m_arm, 2);
+    
+    Command dropArm = new dropArm(m_arm, 2);
 
+    moveArm.schedule();
     forward.schedule();
-    if(System.currentTimeMillis() - startTime > 3000){
+      
+    
+  
+    if(System.currentTimeMillis() - startTime > 2000){
       CommandScheduler.getInstance().cancel(forward);
+      
+      
+    }
 
-
-
+    if(System.currentTimeMillis() - startTime > 4000){
+      dropArm.schedule();
+    }
 
     //commands
     // RunCommand forward = new RunCommand(() -> m_robotDrive.drive(.6, 0, 0, false, 0.3), m_robotDrive);
@@ -743,7 +748,7 @@ public class RobotContainer {
     //           break;
 
     //     }
-    }
+    
 }
 }
 
