@@ -683,6 +683,7 @@ public class RobotContainer {
 
     RunCommand forward = new RunCommand(() -> m_robotDrive.drive(.4, 0, 0, false, 0.3), m_robotDrive);
     
+
     Command moveArm = new moveArm(m_arm, 2);
     
     Command dropArm = new dropArm(m_arm, 2);
@@ -701,6 +702,10 @@ public class RobotContainer {
     if(System.currentTimeMillis() - startTime > 4000){
       dropArm.schedule();
     }
+
+    // if(System.currentTimeMillis() - startTime > 5000){
+    //   dropArm.schedule();
+    // }
 
     //commands
     // RunCommand forward = new RunCommand(() -> m_robotDrive.drive(.6, 0, 0, false, 0.3), m_robotDrive);

@@ -117,7 +117,7 @@ public class AlageIntake extends SubsystemBase{
 
     public void lockMotors(){ // IDKI IF THIS WORKS
         if(wheelSequence == 2){
-            m_wheels.set(MathUtil.clamp(pid.calculate(wheelEncoder.getPosition(), wheelsLockPos), -.2, .2));
+            m_wheels.set(MathUtil.clamp(pid.calculate(wheelEncoder.getPosition(), wheelsLockPos - 10), -.2, .2));
             
 
 
